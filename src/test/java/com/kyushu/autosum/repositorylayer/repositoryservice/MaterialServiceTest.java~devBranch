@@ -1,0 +1,124 @@
+package com.kyushu.autosum.repositorylayer.repositoryservice;
+
+import com.kyushu.autosum.repositorylayer.repositoryservice.MaterialService;
+import com.kyushu.autosum.repositorylayer.repositoryservice.MaterialServiceImpl;
+import com.kyushu.autosum.repositorylayer.domain.Material;
+import com.kyushu.autosum.repositorylayer.repositories.MaterialRepository;
+import org.junit.Test;
+import org.mockito.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.OptionalLong;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
+/**
+ * Created by ANDRE on 23/04/16.
+ */
+@SuppressWarnings("Duplicates")
+public class MaterialServiceTest {
+
+    @Mock //Mockito Mock object
+    private MaterialRepository materialRepository;
+
+    @InjectMocks
+    private MaterialService materialService = new MaterialServiceImpl();
+
+    public MaterialServiceTest() {
+        MockitoAnnotations.initMocks(this); //initilizes controller and mocks
+    }
+
+    @Test
+    public void testFindAll() throws Exception{
+
+        final long NUMBER_OF_MATERIALS = 3;
+
+        List<Material> materialList = new ArrayList<>();
+        materialList.add(new Material());
+        materialList.add(new Material());
+
+        //Stub response
+        when(materialRepository.findAll()).thenReturn(materialList);
+
+        assertEquals(materialList,materialService.findAll());
+
+    }
+
+    @Test
+    public void testFindById() throws Exception {
+
+        final Integer ID = 1;
+        long SIZE = 42;
+
+        //Material will have a Real Behaviour
+        materialService = Mockito.spy(materialService);
+
+        //We return the Size
+        Mockito.doReturn(OptionalLong.of(SIZE)).when(materialService).size();
+
+        when(materialRepository.getOne(ID)).thenReturn(new Material());
+
+        assertEquals(true, materialService.findById(ID).isPresent());
+
+    }
+
+    @Test
+    public void testSave() throws Exception{
+
+        final String fileName = "PDFsam_merge.pdf" ;
+
+        //Create Material
+        Material material = new Material();
+        material.setText("Material title");
+
+        //Call setMaterial(Material)
+        when(materialRepository.save(any(Material.class))).thenReturn(material);
+
+        //Some tests
+        assertEquals(true, materialService.save(material).isPresent());
+    }
+
+
+//    @Test
+//    public void testSave2() throws Exception {
+//
+//        Material material = new Material();
+//
+//        material.setText("Unity test : testSave2");
+//        material.setMaterialFilePATH("PATH to unity test");
+//
+//        Slide slide = new Slide();
+//        slide.setText("Unity test slide test");
+//
+//        material.addSlide(slide);
+//
+//        Material material1 = new Material();
+//        material1.setText(material.getText());
+//        material1.setMaterialFilePATH(material.getMaterialFilePATH());
+//        Slide slide1 = new Slide();
+//        slide.setText(material.getSlideList().get(0).getText());
+//        material.addSlide(slide);
+//
+//        Mockito.when(materialRepository.save(any(Material.class))).thenReturn(material);
+//
+//        Optional<Material> materialOptional = materialService.save(material);
+//
+//        assertEquals(true, materialOptional.isPresent());
+//
+//        System.out.println(materialOptional.toString());
+//
+//    }
+
+    @Test
+    public void testSize() throws Exception {
+
+        final long SIZE = 2;
+
+        Mockito.when(materialRepository.count()).thenReturn(SIZE);
+
+        assertEquals(SIZE,materialService.size().getAsLong());
+
+    }
+
+}
+
